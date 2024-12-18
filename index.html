@@ -78,3 +78,73 @@
     }
 </script></body>
 </html>
+
+
+<!-- Footer dengan button update -->
+    <div class="mt-8">
+        <button id="updateButton" class="bg-blue-500 text-white px-4 py-2 rounded">Update Data</button>
+    </div>
+
+    <script>
+        let csvData = [];
+
+        // Function to fetch and parse CSV data
+        async function fetchCSVData() {
+            const response = await fetch('Data.csv');
+            const text = await response.text();
+            csvData = parseCSV(text);
+        }
+
+        // Function to parse CSV text into an array
+        function parseCSV(text) {
+            const rows = text.split('\n').map(row => row.split(','));
+            return rows;
+        }
+
+        // Call the fetch function when the page loads
+        window.onload = function() {
+            fetchCSVData();
+        };
+
+        document.getElementById('searchInput').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                const query = this.value.toLowerCase();
+                const results = csvData.filter(row => row[1].toLowerCase().includes(query)); // Mencari berdasarkan nama
+                displayResults(results);
+            }
+        });
+
+        function displayResults(results) {
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
+
+            if (results.length === 0) {
+                resultsContainer.innerHTML = '<div class="text-gray-400 p-4">No results found.</div>';
+                return;
+            }
+
+            results.forEach(result => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'bg-gray-800 p-4 rounded mb-2 shadow-lg transition-transform transform hover:scale-105';
+                resultItem.innerHTML = `
+                    <h2 class="text-lg font-semibold text-white">${result[1]}</h2>
+                    <p class="text-gray-400">Kelas: ${result[0]}</p>
+                    <p class="text-gray-400">SPP Sudah Dibayarkan: ${result[2]}</p>
+                    <a href="${result[9]}" class="text-blue-400 underline">Download Rapor</a>
+                `;
+                resultsContainer.appendChild(resultItem);
+            });
+        }
+
+// Function to handle update button click
+document.getElementById('updateButton').addEventListener('click', function() {
+    const password = prompt("Masukkan password untuk memperbarui data:");
+    if (password === "337788") {
+        // Membuka file Data.csv di jendela baru
+        window.open('Data.csv', '_blank');
+    } else {
+        alert("Password salah!");
+    }
+});
+    </script>
+</body>
